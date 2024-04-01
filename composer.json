@@ -27,12 +27,12 @@
             "services": [
                 "think\\addons\\Service"
             ],
-            "config":{
+            "config": {
                 "addons": "src/config.php"
             }
         }
     },
-    "scripts" : {
+    "scripts": {
         "post-install-cmd": [
             "php think addons:config"
         ]

@@ -1,23 +1,5 @@
 <?php
-/**
- * +----------------------------------------------------------------------
- * | think-addons [thinkphp6]
- * +----------------------------------------------------------------------
- *  .--,       .--,             | FILE: Route.php
- * ( (  \.---./  ) )            | AUTHOR: byron
- *  '.__/o   o\__.'             | EMAIL: xiaobo.sun@qq.com
- *     {=  ^  =}                | QQ: 150093589
- *     /       \                | DATETIME: 2019/11/5 09:57
- *    //       \\               |
- *   //|   .   |\\              |
- *   "'\       /'"_.-~^`'-.     |
- *      \  _  /--'         `    |
- *    ___)( )(___               |-----------------------------------------
- *   (((__) (__)))              | 高山仰止,景行行止.虽不能至,心向往之。
- * +----------------------------------------------------------------------
- * | Copyright (c) 2019 http://www.zzstudio.net All rights reserved.
- * +----------------------------------------------------------------------
- */
+
 declare(strict_types=1);
 
 namespace think\addons;
@@ -35,12 +17,12 @@ class Route
      */
     public static function execute()
     {
-        $app = app();
+        $app     = app();
         $request = $app->request;
 
-        $addon = $request->route('addon');
+        $addon      = $request->route('addon');
         $controller = $request->route('controller', 'index');
-        $action = $request->route('action', 'index') ?: 'index';
+        $action     = $request->route('action', 'index') ?: 'index';
 
         Event::trigger('addons_begin', $request);
 
@@ -50,6 +32,8 @@ class Route
 
         $request->addon = $addon;
         // 设置当前请求的控制器、操作
+//        $controller = str_replace('.', '/', $controller);
+//        dd($controller);
         $request->setController($controller)->setAction($action);
 
         // 获取插件基础信息
@@ -63,13 +47,14 @@ class Route
 
         // 监听addon_module_init
         Event::trigger('addon_module_init', $request);
-        $class = get_addons_class($addon, 'controller', $controller);
+        $class = get_addons_class(str_replace('.', '\\', $addon), 'controller', $controller);
+
         if (!$class) {
             throw new HttpException(404, lang('addon controller %s not found', [Str::studly($controller)]));
         }
 
         // 重写视图基础路径
-        $config = Config::get('view');
+        $config              = Config::get('view');
         $config['view_path'] = $app->addons->getAddonsPath() . $addon . DIRECTORY_SEPARATOR . 'view' . DIRECTORY_SEPARATOR;
         Config::set($config, 'view');
 
@@ -92,7 +77,7 @@ class Route
             $vars = [$action];
         } else {
             // 操作不存在
-            throw new HttpException(404, lang('addon action %s not found', [get_class($instance).'->'.$action.'()']));
+            throw new HttpException(404, lang('addon action %s not found', [get_class($instance) . '->' . $action . '()']));
         }
         Event::trigger('addons_action_begin', $call);
 

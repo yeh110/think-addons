@@ -18,18 +18,18 @@ spl_autoload_register(function ($class) {
 
     $class = ltrim($class, '\\');
 
-    $dir = app()->getRootPath();
+    $dir       = app()->getRootPath();
     $namespace = 'addons';
 
     if (strpos($class, $namespace) === 0) {
         $class = substr($class, strlen($namespace));
-        $path = '';
+        $path  = '';
         if (($pos = strripos($class, '\\')) !== false) {
-            $path = str_replace('\\', '/', substr($class, 0, $pos)) . '/';
+            $path  = str_replace('\\', '/', substr($class, 0, $pos)) . '/';
             $class = substr($class, $pos + 1);
         }
         $path .= str_replace('_', '/', $class) . '.php';
-        $dir .= $namespace . $path;
+        $dir  .= $namespace . $path;
 
         if (file_exists($dir)) {
             include $dir;
@@ -115,7 +115,7 @@ if (!function_exists('get_addons_class')) {
             $class = explode('.', $class);
 
             $class[count($class) - 1] = Str::studly(end($class));
-            $class = implode('\\', $class);
+            $class                    = implode('\\', $class);
         } else {
             $class = Str::studly(is_null($class) ? $name : $class);
         }
@@ -149,21 +149,21 @@ if (!function_exists('addons_url')) {
         $request = app('request');
         if (empty($url)) {
             // 生成 url 模板变量
-            $addons = $request->addon;
+            $addons     = $request->addon;
             $controller = $request->controller();
             $controller = str_replace('/', '.', $controller);
-            $action = $request->action();
+            $action     = $request->action();
         } else {
             $url = Str::studly($url);
             $url = parse_url($url);
             if (isset($url['scheme'])) {
-                $addons = strtolower($url['scheme']);
+                $addons     = strtolower($url['scheme']);
                 $controller = $url['host'];
-                $action = trim($url['path'], '/');
+                $action     = trim($url['path'], '/');
             } else {
-                $route = explode('/', $url['path']);
-                $addons = $request->addon;
-                $action = array_pop($route);
+                $route      = explode('/', $url['path']);
+                $addons     = $request->addon;
+                $action     = array_pop($route);
                 $controller = array_pop($route) ?: $request->controller();
             }
             $controller = Str::snake((string)$controller);

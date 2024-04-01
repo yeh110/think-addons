@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace think\addons;
 
 use think\Route;
-use think\helper\Str;
 use think\facade\Config;
 use think\facade\Lang;
 use think\facade\Cache;
@@ -24,9 +23,7 @@ class Service extends \think\Service
     {
         $this->addons_path = $this->getAddonsPath();
         // 加载系统语言包
-        Lang::load([
-            $this->app->getRootPath() . '/vendor/zzstudio/think-addons/src/lang/zh-cn.php'
-        ]);
+        Lang::load([__DIR__ . '/src/lang/zh-cn.php']);
         // 自动载入插件
         $this->autoload();
         // 加载插件事件
@@ -41,6 +38,9 @@ class Service extends \think\Service
 
     public function boot()
     {
+        $this->commands([
+            'addons:build' => command\AddonsBuild::class,
+        ]);
         $this->registerRoutes(function (Route $route) {
             // 路由脚本
             $execute = '\\think\\addons\\Route@execute';
@@ -50,24 +50,25 @@ class Service extends \think\Service
                 $this->app->middleware->import(include $this->app->addons->getAddonsPath() . 'middleware.php', 'route');
             }
 
+            $root = Config::get('addons.root', 'addons');
             // 注册控制器路由
-            $route->rule("addons/:addon/[:controller]/[:action]", $execute)->middleware(Addons::class);
+            $route->rule("{$root}/:addon/[:controller]/[:action]", $execute)->middleware(Addons::class);
             // 自定义路由
-            $routes = (array) Config::get('addons.route', []);
+            $routes = (array)Config::get('addons.route', []);
             foreach ($routes as $key => $val) {
                 if (!$val) {
                     continue;
                 }
                 if (is_array($val)) {
                     $domain = $val['domain'];
-                    $rules = [];
+                    $rules  = [];
                     foreach ($val['rule'] as $k => $rule) {
                         [$addon, $controller, $action] = explode('/', $rule);
                         $rules[$k] = [
-                            'addon'         => $addon,
-                            'controller'    => $controller,
-                            'action'        => $action,
-                            'indomain'      => 1,
+                            'addon'      => $addon,
+                            'controller' => $controller,
+                            'action'     => $action,
+                            'indomain'   => 1,
                         ];
                     }
                     $route->domain($domain, function () use ($rules, $route, $execute) {
@@ -85,13 +86,28 @@ class Service extends \think\Service
                         ->name($key)
                         ->completeMatch(true)
                         ->append([
-                            'addon'  => $addon,
+                            'addon'      => $addon,
                             'controller' => $controller,
-                            'action' => $action
+                            'action'     => $action
                         ]);
                 }
             }
         });
+        $this->loadRouteFile();
+    }
+
+    /**
+     * 加载路由文件
+     */
+    private function loadRouteFile()
+    {
+        $addonsPath = $this->app->addons->getAddonsPath();
+        $paths      = glob($addonsPath . '*/route.php');
+        if ($paths) {
+            foreach ($paths as $path) {
+                $this->loadRoutesFrom($path);
+            }
+        }
     }
 
     /**
@@ -101,13 +117,13 @@ class Service extends \think\Service
     {
         $hooks = $this->app->isDebug() ? [] : Cache::get('hooks', []);
         if (empty($hooks)) {
-            $hooks = (array) Config::get('addons.hooks', []);
+            $hooks = (array)Config::get('addons.hooks', []);
             // 初始化钩子
             foreach ($hooks as $key => $values) {
                 if (is_string($values)) {
                     $values = explode(',', $values);
                 } else {
-                    $values = (array) $values;
+                    $values = (array)$values;
                 }
                 $hooks[$key] = array_filter(array_map(function ($v) use ($key) {
                     return [get_addons_class($v), $key];
@@ -130,7 +146,7 @@ class Service extends \think\Service
     private function loadService()
     {
         $results = scandir($this->addons_path);
-        $bind = [];
+        $bind    = [];
         foreach ($results as $name) {
             if ($name === '.' or $name === '..') {
                 continue;
@@ -249,7 +265,7 @@ class Service extends \think\Service
      */
     public function getAddonsConfig()
     {
-        $name = $this->app->request->addon;
+        $name  = $this->app->request->addon;
         $addon = get_addons_instance($name);
         if (!$addon) {
             return [];

@@ -1,0 +1,56 @@
+<?php
+
+namespace {%namespace%};;
+
+use think\Addons;
+
+/**
+ * {%title%}; 插件
+ */
+class Plugin extends Addons
+{
+    // 该插件的基础信息
+    public $info = [
+        'name'        => '{%name%};',    // 插件标识
+        'title'       => '{%title%};',    // 插件名称
+        'description' => '{%description%};',    // 插件简介
+        'status'      => 1, //插件状态1启用，0禁用
+        'web'         => '', //插件官网地址
+        'docs'        => '', //插件文档地址
+        'author'      => '{%author%}', //插件作者
+        'version'     => '{%version%}' //插件版本
+    ];
+
+    protected function initialize()
+    {
+        //初始化方法
+    }
+
+    /**
+     * 插件安装方法
+     * @return bool
+     */
+    public function install()
+    {
+        return true;
+    }
+
+    /**
+     * 插件卸载方法
+     * @return bool
+     */
+    public function uninstall()
+    {
+        return true;
+    }
+
+    /**
+     * 演示钩子方法
+     * @return mixed
+     */
+    public function testhook($param)
+    {
+
+    }
+
+}

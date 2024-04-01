@@ -1,23 +1,4 @@
 <?php
-/**
- * +----------------------------------------------------------------------
- * | think-addons [thinkphp6]
- * +----------------------------------------------------------------------
- *  .--,       .--,             | FILE: Addons.php
- * ( (  \.---./  ) )            | AUTHOR: byron
- *  '.__/o   o\__.'             | EMAIL: xiaobo.sun@qq.com
- *     {=  ^  =}                | QQ: 150093589
- *     /       \                | DATETIME: 2019/11/5 14:47
- *    //       \\               |
- *   //|   .   |\\              |
- *   "'\       /'"_.-~^`'-.     |
- *      \  _  /--'         `    |
- *    ___)( )(___               |-----------------------------------------
- *   (((__) (__)))              | 高山仰止,景行行止.虽不能至,心向往之。
- * +----------------------------------------------------------------------
- * | Copyright (c) 2019 http://www.zzstudio.net All rights reserved.
- * +----------------------------------------------------------------------
- */
 declare(strict_types=1);
 
 namespace think;
@@ -51,13 +32,13 @@ abstract class Addons
      */
     public function __construct(App $app)
     {
-        $this->app = $app;
-        $this->request = $app->request;
-        $this->name = $this->getName();
-        $this->addon_path = $app->addons->getAddonsPath() . $this->name . DIRECTORY_SEPARATOR;
+        $this->app          = $app;
+        $this->request      = $app->request;
+        $this->name         = $this->getName();
+        $this->addon_path   = $app->addons->getAddonsPath() . $this->name . DIRECTORY_SEPARATOR;
         $this->addon_config = "addon_{$this->name}_config";
-        $this->addon_info = "addon_{$this->name}_info";
-        $this->view = clone View::engine('Think');
+        $this->addon_info   = "addon_{$this->name}_info";
+        $this->view         = clone View::engine('Think');
         $this->view->config([
             'view_path' => $this->addon_path . 'view' . DIRECTORY_SEPARATOR
         ]);
@@ -68,7 +49,8 @@ abstract class Addons
 
     // 初始化
     protected function initialize()
-    {}
+    {
+    }
 
     /**
      * 获取插件标识
@@ -77,7 +59,7 @@ abstract class Addons
     final protected function getName()
     {
         $class = get_class($this);
-        list(, $name, ) = explode('\\', $class);
+        list(, $name,) = explode('\\', $class);
         $this->request->addon = $name;
 
         return $name;
@@ -86,7 +68,7 @@ abstract class Addons
     /**
      * 加载模板输出
      * @param string $template
-     * @param array $vars           模板文件名
+     * @param array $vars 模板文件名
      * @return false|mixed|string   模板输出变量
      * @throws \think\Exception
      */
@@ -98,8 +80,8 @@ abstract class Addons
     /**
      * 渲染内容输出
      * @access protected
-     * @param  string $content 模板内容
-     * @param  array  $vars    模板输出变量
+     * @param string $content 模板内容
+     * @param array $vars 模板输出变量
      * @return mixed
      */
     protected function display($content = '', $vars = [])
@@ -110,8 +92,8 @@ abstract class Addons
     /**
      * 模板变量赋值
      * @access protected
-     * @param  mixed $name  要显示的模板变量
-     * @param  mixed $value 变量的值
+     * @param mixed $name 要显示的模板变量
+     * @param mixed $value 变量的值
      * @return $this
      */
     protected function assign($name, $value = '')
@@ -124,7 +106,7 @@ abstract class Addons
     /**
      * 初始化模板引擎
      * @access protected
-     * @param  array|string $engine 引擎参数
+     * @param array|string $engine 引擎参数
      * @return $this
      */
     protected function engine($engine)
@@ -150,9 +132,9 @@ abstract class Addons
         // 文件配置
         $info_file = $this->addon_path . 'info.ini';
         if (is_file($info_file)) {
-            $_info = parse_ini_file($info_file, true, INI_SCANNER_TYPED) ?: [];
+            $_info        = parse_ini_file($info_file, true, INI_SCANNER_TYPED) ?: [];
             $_info['url'] = addons_url();
-            $info = array_merge($_info, $info);
+            $info         = array_merge($_info, $info);
         }
         Config::set($info, $this->addon_info);
 
