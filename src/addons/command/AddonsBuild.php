@@ -35,6 +35,7 @@ class AddonsBuild extends Command
             $output->writeln("<info>创建失败，请输入插件名称</info>");
             return;
         }
+        $option['name']        = $app;
         $option['title']       = $input->getOption('title') ?: $app;
         $option['description'] = $input->getOption('desc') ?: $app;
         $option['author']      = $input->getOption('author') ?: 'Circle';

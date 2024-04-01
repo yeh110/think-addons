@@ -7,9 +7,6 @@ use think\Request;
 
 class {%className%}
 {
-    /**
-     * @return \think\Response
-     */
     public function index()
     {
         return "[{%title%}]插件默认控制器";
